@@ -2,7 +2,6 @@
 using System.Data;
 using System.Data.Common;
 using FluentMigrator.Runner;
-using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

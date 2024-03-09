@@ -16,23 +16,19 @@ using Paramore.Brighter.Outbox.Sqlite;
 using Paramore.Brighter.ServiceActivator.Extensions.DependencyInjection;
 using Paramore.Brighter.ServiceActivator.Extensions.Hosting;
 using Paramore.Brighter.Sqlite;
-using Transmogrification.Application.Ports.Driving;
 using Transmogrification.Database;
-using Transmogrification.Messaging;
 using Transmogrification.Policies;
 
 var host = CreateHostBuilder(args).Build();
 host.CheckDbIsUp();
 host.MigrateDatabase();
 host.CreateInbox();
-host.CreateOutbox(HasBinaryMessagePayload());
+host.CreateOutbox(true);
 await host.RunAsync();
 return;
 
-static void AddSchemaRegistryMaybe(IServiceCollection services, MessagingTransport messagingTransport)
+static void AddSchemaRegistry(IServiceCollection services)
 {
-    if (messagingTransport != MessagingTransport.Kafka) return;
-
     var schemaRegistryConfig = new SchemaRegistryConfig { Url = "http://localhost:8081" };
     var cachedSchemaRegistryClient = new CachedSchemaRegistryClient(schemaRegistryConfig);
     services.AddSingleton<ISchemaRegistryClient>(cachedSchemaRegistryClient);
@@ -66,18 +62,16 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
 
 static void ConfigureBrighter(HostBuilderContext hostContext, IServiceCollection services)
 {
-    var messagingTransport = GetTransportType(hostContext.Configuration[MessagingGlobals.BRIGHTER_TRANSPORT]);
+    AddSchemaRegistry(services);
 
-    AddSchemaRegistryMaybe(services, messagingTransport);
-
-    Subscription[] subscriptions = GetSubscriptions(messagingTransport);
+    Subscription[] subscriptions = GetSubscriptions();
 
     var relationalDatabaseConfiguration = new RelationalDatabaseConfiguration(GetDevDbConnectionString());
     services.AddSingleton<IAmARelationalDatabaseConfiguration>(relationalDatabaseConfiguration);
 
     var outboxConfiguration = new RelationalDatabaseConfiguration(
         GetDevDbConnectionString(),
-        binaryMessagePayload: messagingTransport == MessagingTransport.Kafka
+        binaryMessagePayload: true
     );
     services.AddSingleton<IAmARelationalDatabaseConfiguration>(outboxConfiguration);
 
@@ -87,7 +81,7 @@ static void ConfigureBrighter(HostBuilderContext hostContext, IServiceCollection
     services.AddServiceActivator(options =>
         {
             options.Subscriptions = subscriptions;
-            options.ChannelFactory = GetChannelFactory(messagingTransport);
+            options.ChannelFactory = GetChannelFactory();
             options.UseScoped = true;
             options.HandlerLifetime = ServiceLifetime.Scoped;
             options.MapperLifetime = ServiceLifetime.Singleton;
@@ -107,7 +101,7 @@ static void ConfigureBrighter(HostBuilderContext hostContext, IServiceCollection
         })
         .UseExternalBus((config) =>
         {
-            config.ProducerRegistry = ConfigureProducerRegistry(messagingTransport);
+            config.ProducerRegistry = ConfigureProducerRegistry();
             config.Outbox = makeOutbox.outbox;
             config.ConnectionProvider = makeOutbox.connectionProvider;
             config.TransactionProvider = makeOutbox.transactionProvider;
@@ -125,7 +119,7 @@ static void ConfigureSqlite(HostBuilderContext hostBuilderContext, IServiceColle
         {
             c.AddSQLite()
                 .WithGlobalConnectionString(GetDevDbConnectionString())
-                .ScanIn(typeof(Salutations_Migrations.Migrations.SqlInitialMigrations).Assembly).For.Migrations();
+                .ScanIn(typeof(Transmogrification_Migrations.Migrations.SqlInitialMigrations).Assembly).For.Migrations();
         });
 }
 
@@ -140,7 +134,7 @@ static IAmAnInbox CreateInbox(HostBuilderContext hostContext, IAmARelationalData
     return new SqliteInbox(configuration);
 }
 
-static IAmAProducerRegistry ConfigureProducerRegistry(MessagingTransport messagingTransport)
+static IAmAProducerRegistry ConfigureProducerRegistry()
 {
     var producerRegistry = new KafkaProducerRegistryFactory(
             new KafkaMessagingGatewayConfiguration
@@ -151,7 +145,7 @@ static IAmAProducerRegistry ConfigureProducerRegistry(MessagingTransport messagi
             {
                 new KafkaPublication
                 {
-                    Topic = new RoutingKey("SalutationReceived"),
+                    Topic = new RoutingKey("TransmogrificationRequested"),
                     MessageSendMaxRetries = 3,
                     MessageTimeoutMs = 1000,
                     MaxInFlightRequestsPerConnection = 1,
@@ -163,7 +157,7 @@ static IAmAProducerRegistry ConfigureProducerRegistry(MessagingTransport messagi
     return producerRegistry;
 }
 
-static IAmAChannelFactory GetChannelFactory(MessagingTransport messagingTransport)
+static IAmAChannelFactory GetChannelFactory()
 {
     return new ChannelFactory(
         new KafkaMessageConsumerFactory(
@@ -186,14 +180,14 @@ static string GetDevDbConnectionString()
     return "Filename=Salutations.db;Cache=Shared";
 }
 
-static Subscription[] GetSubscriptions(MessagingTransport messagingTransport)
+static KafkaSubscription[] GetSubscriptions()
 {
     var subscriptions = new KafkaSubscription[]
     {
-        new KafkaSubscription<GreetingMade>(
-            new SubscriptionName("paramore.sample.salutationanalytics"),
+        new KafkaSubscription<Transmogrification.Application.Ports.Driving.Transmogrification>(
+            new SubscriptionName("paramore.sample.transmogrification"),
             channelName: new ChannelName("Transmogrification"),
-            routingKey: new RoutingKey("GreetingMade"),
+            routingKey: new RoutingKey("Transmogrification"),
             groupId: "kafka-GreetingsReceiverConsole-Sample",
             timeoutInMilliseconds: 100,
             offsetDefault: AutoOffsetReset.Earliest,
@@ -203,20 +197,4 @@ static Subscription[] GetSubscriptions(MessagingTransport messagingTransport)
             makeChannels: OnMissingChannel.Create)
     };
     return subscriptions;
-}
-
-static MessagingTransport GetTransportType(string brighterTransport)
-{
-    return brighterTransport switch
-    {
-        MessagingGlobals.RMQ => MessagingTransport.Rmq,
-        MessagingGlobals.KAFKA => MessagingTransport.Kafka,
-        _ => throw new ArgumentOutOfRangeException(nameof(MessagingGlobals.BRIGHTER_TRANSPORT),
-            "Messaging transport is not supported")
-    };
-}
-
-static bool HasBinaryMessagePayload()
-{
-    return GetTransportType(Environment.GetEnvironmentVariable("BRIGHTER_TRANSPORT")) == MessagingTransport.Kafka;
 }
