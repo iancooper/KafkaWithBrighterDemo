@@ -2,15 +2,15 @@
 
 namespace Transmogrification.Application.Entities
 {
-    public class TransmogrificationSettings
+    public class TransmogrificationResult
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Transformation { get; set; } = string.Empty; 
         
-        public TransmogrificationSettings() {}
+        public TransmogrificationResult() {}
         
-        public TransmogrificationSettings(string name, string transformation)
+        public TransmogrificationResult(string name, string transformation)
         {
             Name = name;
             Transformation = transformation;

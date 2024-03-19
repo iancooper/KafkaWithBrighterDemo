@@ -156,7 +156,7 @@ namespace Transmogrifier
                     {
                         new KafkaPublication
                         {
-                            Topic = new RoutingKey("GreetingMade"),
+                            Topic = new RoutingKey("TransmogrificationMade"),
                             MessageSendMaxRetries = 3,
                             MessageTimeoutMs = 1000,
                             MaxInFlightRequestsPerConnection = 1,

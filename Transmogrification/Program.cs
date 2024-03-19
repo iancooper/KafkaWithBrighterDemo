@@ -145,7 +145,7 @@ static IAmAProducerRegistry ConfigureProducerRegistry()
             {
                 new KafkaPublication
                 {
-                    Topic = new RoutingKey("TransmogrificationRequested"),
+                    Topic = new RoutingKey("TransmogrificationResult"),
                     MessageSendMaxRetries = 3,
                     MessageTimeoutMs = 1000,
                     MaxInFlightRequestsPerConnection = 1,

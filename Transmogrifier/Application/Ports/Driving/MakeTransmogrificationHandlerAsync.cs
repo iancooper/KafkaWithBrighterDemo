@@ -13,15 +13,15 @@ using Transmogrifier.Application.Ports.Driven;
 
 namespace Transmogrifier.Application.Ports.Driving
 {
-    public class AddGreetingHandlerAsync(
+    public class MakeTransmogrificationHandlerAsync(
         IAmATransactionConnectionProvider transactionProvider,
         IAmACommandProcessor postBox,
-        ILogger<AddGreetingHandlerAsync> logger)
-        : RequestHandlerAsync<AddGreeting>
+        ILogger<MakeTransmogrificationHandlerAsync> logger)
+        : RequestHandlerAsync<MakeTransmogrification>
     {
         [RequestLoggingAsync(0, HandlerTiming.Before)]
         [UsePolicyAsync(step:1, policy: Policies.Retry.EXPONENTIAL_RETRYPOLICYASYNC)]
-        public override async Task<AddGreeting> HandleAsync(AddGreeting addGreeting, CancellationToken cancellationToken = default)
+        public override async Task<MakeTransmogrification> HandleAsync(MakeTransmogrification makeTransmogrification, CancellationToken cancellationToken = default)
         {
             var posts = new List<Guid>();
             
@@ -34,24 +34,24 @@ namespace Transmogrifier.Application.Ports.Driving
             {
                 var people = await conn.QueryAsync<Person>(
                     "select * from Person where name = @name",
-                    new {name = addGreeting.Name},
+                    new {name = makeTransmogrification.Name},
                     tx
                 );
                 var person = people.SingleOrDefault();
 
                 if (person != null)
                 {
-                    var greeting = new Greeting(addGreeting.Greeting, person);
+                    var transmogrification = new Transmogrification(makeTransmogrification.Description, person);
 
                     //write the added child entity to the Db
                     await conn.ExecuteAsync(
-                        "insert into Greeting (Message, Recipient_Id) values (@Message, @RecipientId)",
-                        new { greeting.Message, RecipientId = greeting.RecipientId },
+                        "insert into Tramsmogrification (Description, Recipient_Id) values (@Description, @RecipientId)",
+                        new { transmogrification.Description, RecipientId = transmogrification.RecipientId },
                         tx);
 
                     //Now write the message we want to send to the Db in the same transaction.
                     posts.Add(await postBox.DepositPostAsync(
-                        new GreetingMade(greeting.Greet()),
+                        new TransmogrificationMade(person, transmogrification),
                         transactionProvider,
                         cancellationToken: cancellationToken));
 
@@ -61,10 +61,10 @@ namespace Transmogrifier.Application.Ports.Driving
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Exception thrown handling Add Greeting request");
+                logger.LogError(e, "Exception thrown handling Add Description request");
                 //it went wrong, rollback the entity change and the downstream message
                 await transactionProvider.RollbackAsync(cancellationToken);
-                return await base.HandleAsync(addGreeting, cancellationToken);
+                return await base.HandleAsync(makeTransmogrification, cancellationToken);
             }
             finally
             {
@@ -75,7 +75,7 @@ namespace Transmogrifier.Application.Ports.Driving
             //Alternatively, you can let the Sweeper do this, but at the cost of increased latency
             await postBox.ClearOutboxAsync(posts, cancellationToken:cancellationToken);
 
-            return await base.HandleAsync(addGreeting, cancellationToken);
+            return await base.HandleAsync(makeTransmogrification, cancellationToken);
         }
     }
 }

@@ -13,46 +13,45 @@ using Transmogrifier.Policies;
 
 namespace Transmogrifier.Application.Ports.Driving
 {
-    public class FindGreetingsForPersonHandlerAsync(IAmARelationalDbConnectionProvider relationalDbConnectionProvider)
-        : QueryHandlerAsync<FindGreetingsForPerson, FindPersonsGreetings>
+    public class FindTransmogrificationsForPersonHandlerAsync(
+        IAmARelationalDbConnectionProvider relationalDbConnectionProvider)
+        : QueryHandlerAsync<FindTransmogrificationsForPerson, FindPersonTransmogrifications>
     {
         [QueryLogging(0)]
         [RetryableQuery(1, Retry.EXPONENTIAL_RETRYPOLICYASYNC)]
-        public override async Task<FindPersonsGreetings> ExecuteAsync(FindGreetingsForPerson query, CancellationToken cancellationToken = new CancellationToken())
+        public override async Task<FindPersonTransmogrifications> ExecuteAsync(FindTransmogrificationsForPerson query,
+            CancellationToken cancellationToken = new CancellationToken())
         {
             //Retrieving parent and child is a bit tricky with Dapper. From raw SQL We wget back a set that has a row-per-child. We need to turn that
             //into one entity per parent, with a collection of children. To do that we bring everything back into memory, group by parent id and collate all
             //the children for that group.
 
-            var sql = @"select p.Id, p.Name, g.Id, g.Message 
+            var sql = @"select p.Id, p.Name, t.Id, t.Description 
                         from Person p
-                        inner join Greeting g on g.Recipient_Id = p.Id";
+                        inner join Transmogrifications t on t.Recipient_Id = p.Id";
             await using var connection = await relationalDbConnectionProvider.GetConnectionAsync(cancellationToken);
-            var people = await connection.QueryAsync<Person, Greeting, Person>(sql, (person, greeting) =>
-            {
-                person.Greetings.Add(greeting);
-                return person;
-            }, splitOn: "Id");
-            
+            var people = await connection.QueryAsync<Person, Transmogrification, Person>(sql,
+                (person, transmogrification) =>
+                {
+                    person.Transmogrifications.Add(transmogrification);
+                    return person;
+                }, splitOn: "Id");
+
             if (!people.Any())
             {
-                return new FindPersonsGreetings(){Name = query.Name, Greetings = Array.Empty<Salutation>()};
+                return new FindPersonTransmogrifications(query.Name, Array.Empty<string>());
             }
 
             var peopleGreetings = people.GroupBy(p => p.Id).Select(grp =>
             {
                 var groupedPerson = grp.First();
-                groupedPerson.Greetings = grp.Select(p => p.Greetings.Single()).ToList();
+                groupedPerson.Transmogrifications = grp.Select(p => p.Transmogrifications.Single()).ToList();
                 return groupedPerson;
             });
 
             var person = peopleGreetings.Single();
 
-            return new FindPersonsGreetings
-            {
-                Name = person.Name, Greetings = person.Greetings.Select(g => new Salutation(g.Greet()))
-            };
+            return new FindPersonTransmogrifications(person.Name, person.Transmogrifications.Select(t => t.Description));
         }
-        
     }
 }

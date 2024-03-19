@@ -8,12 +8,12 @@ namespace Transmogrifier.Adapters.Driving
 {
     [ApiController]
     [Route("[controller]")]
-    public class GreetingsController : Controller
+    public class TransmogrifierController : Controller
     {
         private readonly IAmACommandProcessor _commandProcessor;
         private readonly IQueryProcessor _queryProcessor;
 
-        public GreetingsController(IAmACommandProcessor commandProcessor, IQueryProcessor queryProcessor)
+        public TransmogrifierController(IAmACommandProcessor commandProcessor, IQueryProcessor queryProcessor)
         {
             _commandProcessor = commandProcessor;
             _queryProcessor = queryProcessor;
@@ -23,7 +23,7 @@ namespace Transmogrifier.Adapters.Driving
         [HttpGet]
         public async Task<IActionResult> Get(string name)
         {
-             var personsGreetings = await _queryProcessor.ExecuteAsync<FindPersonsGreetings>(new FindGreetingsForPerson(name));
+             var personsGreetings = await _queryProcessor.ExecuteAsync(new FindTransmogrificationsForPerson(name));
  
              if (personsGreetings == null) return new NotFoundResult();
  
@@ -32,11 +32,11 @@ namespace Transmogrifier.Adapters.Driving
         
         [Route("{name}/new")]
         [HttpPost]
-        public async Task<ActionResult<FindPersonsGreetings>> Post(string name, NewGreeting newGreeting)
+        public async Task<ActionResult<FindPersonTransmogrifications>> Post(string name, NewTransmogrification newTransmogrification)
         {
-            await _commandProcessor.SendAsync(new AddGreeting(name, newGreeting.Greeting));
+            await _commandProcessor.SendAsync(new MakeTransmogrification(name, newTransmogrification.Transmogrification));
 
-            var personsGreetings = await _queryProcessor.ExecuteAsync<FindPersonsGreetings>(new FindGreetingsForPerson(name));
+            var personsGreetings = await _queryProcessor.ExecuteAsync(new FindTransmogrificationsForPerson(name));
 
             if (personsGreetings == null) return new NotFoundResult();
 

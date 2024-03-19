@@ -11,6 +11,7 @@ using Paramore.Brighter.Logging.Attributes;
 using Paramore.Brighter.Policies.Attributes;
 using Transmogrification.Application.Entities;
 using Transmogrification.Application.Ports.Driven;
+using TransmogrificationResult = Transmogrification.Application.Ports.Driven.TransmogrificationResult;
 
 namespace Transmogrification.Application.Ports.Driving
 {
@@ -31,14 +32,14 @@ namespace Transmogrification.Application.Ports.Driving
             var conn = tx.Connection; 
             try
             {
-                var transmogrificationSettings = new TransmogrificationSettings(@event.Name, @event.Transformation);
+                var transmogrificationSettings = new Entities.TransmogrificationResult(@event.Name, @event.Transformation);
                 
                await conn.ExecuteAsync(
-                   "insert into TransmogrificationSettings (Name, Transformation) values (@name, @transformation)", 
+                   "insert into TransmogrificationResult (Name, Transformation) values (@name, @transformation)", 
                    new {name = transmogrificationSettings.Name, transformation = transmogrificationSettings.Transformation},
                    tx); 
                 
-                posts.Add(await postBox.DepositPostAsync(new TransmogrificationRequested(transmogrificationSettings), transactionConnectionProvider, cancellationToken: cancellationToken));
+                posts.Add(await postBox.DepositPostAsync(new TransmogrificationResult(transmogrificationSettings), transactionConnectionProvider, cancellationToken: cancellationToken));
                 
                 await transactionConnectionProvider.CommitAsync(cancellationToken);
             }

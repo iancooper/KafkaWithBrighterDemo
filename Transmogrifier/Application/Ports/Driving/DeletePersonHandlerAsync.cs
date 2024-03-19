@@ -34,7 +34,7 @@ namespace Transmogrifier.Application.Ports.Driving
                 if (person != null)
                 {
                     await connection.ExecuteAsync(
-                        "delete from Greeting where Recipient_Id = @PersonId",
+                        "delete from Description where Recipient_Id = @PersonId",
                         new { PersonId = person.Id },
                         tx);
                     
@@ -47,7 +47,7 @@ namespace Transmogrifier.Application.Ports.Driving
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Exception thrown handling Add Greeting request");
+                logger.LogError(e, "Exception thrown handling Add Description request");
                 //it went wrong, rollback the entity change and the downstream message
                 await tx.RollbackAsync(cancellationToken);
                 return await base.HandleAsync(deletePerson, cancellationToken);
