@@ -92,11 +92,10 @@ namespace Transmogrifier
             services
                 .AddFluentMigratorCore()
                 .ConfigureRunner(c => c.AddSQLite()
-                        .WithGlobalConnectionString(DbConnectionString())
-                        .ScanIn(typeof(SqlInitialCreate).Assembly).For.Migrations()
-                )
-                .AddSingleton<IAmAMigrationConfiguration>(new MigrationConfiguration(){DbType = "Sqlite"});
-            }
+                    .WithGlobalConnectionString(DbConnectionString())
+                    .ScanIn(typeof(SqlInitialCreate).Assembly).For.Migrations()
+                );
+        }
 
         private void ConfigureBrighter(IServiceCollection services)
         {
