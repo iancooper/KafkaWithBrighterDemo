@@ -169,7 +169,7 @@ namespace Transmogrifier
 
         private string DbConnectionString()
         {
-            return "Filename=Greetings.db;Cache=Shared";
+            return "Filename=Transmogrifications.db;Cache=Shared";
         }
     }
 }
