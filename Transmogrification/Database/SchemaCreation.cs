@@ -89,7 +89,7 @@ namespace Transmogrification.Database
             conn.Open();
             using var command = conn.CreateCommand();
 
-            command.CommandText = "CREATE DATABASE IF NOT EXISTS Salutations";
+            command.CommandText = "CREATE DATABASE IF NOT EXISTS TransmogrificationMade";
 
             try
             {
@@ -97,7 +97,7 @@ namespace Transmogrification.Database
             }
             catch (System.Exception e)
             {
-                Console.WriteLine($"Issue with creating Greetings tables, {e.Message}");
+                Console.WriteLine($"Issue with creating TransmogrificationMade tables, {e.Message}");
                 //Rethrow, if we can't create the Outbox, shut down
                 throw;
             }
@@ -169,7 +169,7 @@ namespace Transmogrification.Database
         private static string DbConnectionString()
         {
             //NOTE: Sqlite needs to use a shared cache to allow Db writes to the Outbox as well as entities
-            return "Filename=Salutations.db;Cache=Shared" ; 
+            return "Filename=TransmogrificationMade.sqlite;Cache=Shared" ; 
         }
 
 

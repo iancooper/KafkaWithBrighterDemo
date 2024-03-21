@@ -23,7 +23,6 @@ var host = CreateHostBuilder(args).Build();
 host.CheckDbIsUp();
 host.MigrateDatabase();
 host.CreateInbox();
-host.CreateOutbox(true);
 await host.RunAsync();
 return;
 
@@ -69,15 +68,6 @@ static void ConfigureBrighter(HostBuilderContext hostContext, IServiceCollection
     var relationalDatabaseConfiguration = new RelationalDatabaseConfiguration(GetDevDbConnectionString());
     services.AddSingleton<IAmARelationalDatabaseConfiguration>(relationalDatabaseConfiguration);
 
-    var outboxConfiguration = new RelationalDatabaseConfiguration(
-        GetDevDbConnectionString(),
-        binaryMessagePayload: true
-    );
-    services.AddSingleton<IAmARelationalDatabaseConfiguration>(outboxConfiguration);
-
-    (IAmAnOutbox outbox, Type connectionProvider, Type transactionProvider) makeOutbox =
-        (new SqliteOutbox(outboxConfiguration), typeof(SqliteConnectionProvider), typeof(SqliteUnitOfWork));
-
     services.AddServiceActivator(options =>
         {
             options.Subscriptions = subscriptions;
@@ -98,13 +88,6 @@ static void ConfigureBrighter(HostBuilderContext hostContext, IServiceCollection
         {
             //We don't strictly need this, but added as an example
             options.PropertyNameCaseInsensitive = true;
-        })
-        .UseExternalBus((config) =>
-        {
-            config.ProducerRegistry = ConfigureProducerRegistry();
-            config.Outbox = makeOutbox.outbox;
-            config.ConnectionProvider = makeOutbox.connectionProvider;
-            config.TransactionProvider = makeOutbox.transactionProvider;
         })
         .AutoFromAssemblies();
 
@@ -134,29 +117,6 @@ static IAmAnInbox CreateInbox(HostBuilderContext hostContext, IAmARelationalData
     return new SqliteInbox(configuration);
 }
 
-static IAmAProducerRegistry ConfigureProducerRegistry()
-{
-    var producerRegistry = new KafkaProducerRegistryFactory(
-            new KafkaMessagingGatewayConfiguration
-            {
-                Name = "paramore.brighter.greetingsender", BootStrapServers = new[] { "localhost:9092" }
-            },
-            new KafkaPublication[]
-            {
-                new KafkaPublication
-                {
-                    Topic = new RoutingKey("TransmogrificationResult"),
-                    MessageSendMaxRetries = 3,
-                    MessageTimeoutMs = 1000,
-                    MaxInFlightRequestsPerConnection = 1,
-                    MakeChannels = OnMissingChannel.Create
-                }
-            })
-        .Create();
-
-    return producerRegistry;
-}
-
 static IAmAChannelFactory GetChannelFactory()
 {
     return new ChannelFactory(
@@ -177,17 +137,17 @@ static string GetEnvironment()
 
 static string GetDevDbConnectionString()
 {
-    return "Filename=Salutations.db;Cache=Shared";
+    return "Filename=TransmogrificationMade.sqlite;Cache=Shared";
 }
 
 static KafkaSubscription[] GetSubscriptions()
 {
     var subscriptions = new KafkaSubscription[]
     {
-        new KafkaSubscription<Transmogrification.Application.Ports.Driving.Transmogrification>(
+        new KafkaSubscription<Transmogrification.Application.Ports.Driving.TransmogrificationMade>(
             new SubscriptionName("paramore.sample.transmogrification"),
-            channelName: new ChannelName("Transmogrification"),
-            routingKey: new RoutingKey("Transmogrification"),
+            channelName: new ChannelName("TransmogrificationMade"),
+            routingKey: new RoutingKey("TransmogrificationMade"),
             groupId: "kafka-GreetingsReceiverConsole-Sample",
             timeoutInMilliseconds: 100,
             offsetDefault: AutoOffsetReset.Earliest,

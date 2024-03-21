@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -10,50 +8,45 @@ using Paramore.Brighter.Inbox.Attributes;
 using Paramore.Brighter.Logging.Attributes;
 using Paramore.Brighter.Policies.Attributes;
 using Transmogrification.Application.Entities;
-using Transmogrification.Application.Ports.Driven;
-using TransmogrificationResult = Transmogrification.Application.Ports.Driven.TransmogrificationResult;
 
 namespace Transmogrification.Application.Ports.Driving
 {
-    public class TransmogrificationHandlerAsync(
-        IAmABoxTransactionProvider<DbTransaction> transactionConnectionProvider,
-        IAmACommandProcessor postBox,
-        ILogger<TransmogrificationHandlerAsync> logger)
-        : RequestHandlerAsync<Transmogrification>
+    public class TransmogrificationHandlerAsync : RequestHandlerAsync<TransmogrificationMade>
     {
+        private readonly ILogger<TransmogrificationHandlerAsync> _logger;
+        private readonly IAmARelationalDbConnectionProvider _relationalDbConnectionProvider;
+
+        public TransmogrificationHandlerAsync(
+            IAmARelationalDbConnectionProvider relationalDbConnectionProvider,
+            ILogger<TransmogrificationHandlerAsync> logger
+            )
+        {
+            _logger = logger;
+            _relationalDbConnectionProvider = relationalDbConnectionProvider;
+        }
+
         [UseInboxAsync(step:0, contextKey: typeof(TransmogrificationHandlerAsync), onceOnly: true )] 
         [RequestLoggingAsync(step: 1, timing: HandlerTiming.Before)]
         [UsePolicyAsync(step:2, policy: Policies.Retry.EXPONENTIAL_RETRYPOLICYASYNC)]
-        public override async Task<Transmogrification> HandleAsync(Transmogrification @event, CancellationToken cancellationToken = default)
+        public override async Task<TransmogrificationMade> HandleAsync(TransmogrificationMade @event, CancellationToken cancellationToken = default)
         {
-            var posts = new List<Guid>();
             
-            var tx = await transactionConnectionProvider.GetTransactionAsync(cancellationToken);
-            var conn = tx.Connection; 
+            var conn = await _relationalDbConnectionProvider.GetConnectionAsync(cancellationToken) ; 
             try
             {
-                var transmogrificationSettings = new Entities.TransmogrificationResult(@event.Name, @event.Transformation);
+                var history = new TransmogrificationHistory(@event.Name, @event.Transmogrification);
                 
                await conn.ExecuteAsync(
-                   "insert into TransmogrificationResult (Name, Transformation) values (@name, @transformation)", 
-                   new {name = transmogrificationSettings.Name, transformation = transmogrificationSettings.Transformation},
-                   tx); 
+                   "insert into TransmogrificationHistory (Name, Transmogrification) values (@name, @transformation)", 
+                   new {name = history.Name, transformation = history.Transmogrification}
+                   ); 
                 
-                posts.Add(await postBox.DepositPostAsync(new TransmogrificationResult(transmogrificationSettings), transactionConnectionProvider, cancellationToken: cancellationToken));
-                
-                await transactionConnectionProvider.CommitAsync(cancellationToken);
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Could not save transmogrification settings");
-                                                                           
-                //if it went wrong rollback entity write and Outbox write
-                await transactionConnectionProvider.RollbackAsync(cancellationToken);
-                
+                _logger.LogError(e, "Could not save transmogrification settings");
                 return await base.HandleAsync(@event, cancellationToken);
             }
-
-            postBox.ClearOutbox(posts.ToArray());
             
             return await base.HandleAsync(@event, cancellationToken);
         }

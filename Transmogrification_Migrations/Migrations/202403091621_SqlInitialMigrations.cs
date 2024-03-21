@@ -7,14 +7,14 @@ public class SqlInitialMigrations : Migration
 {
     public override void Up()
     {
-        Create.Table("Transmogrification")
+        Create.Table("TransmogrificationHistory")
             .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
             .WithColumn("Name").AsString()
-            .WithColumn("Transformation").AsString();
+            .WithColumn("Transmogrification").AsString();
     }
 
     public override void Down()
     {
-        Delete.Table("Transmogrification");
+        Delete.Table("TransmogrificationHistory");
     }
 }
