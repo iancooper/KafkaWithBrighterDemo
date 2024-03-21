@@ -18,14 +18,14 @@ GET http://localhost:5000/People/Tyrion HTTP/1.1
 
 ### Now add some transmogrifications
 
-POST http://localhost:5000/Transmogrifications/Tyrion/new HTTP/1.1
+POST http://localhost:5000/Transmogrifier/Tyrion/new HTTP/1.1
 Content-Type: application/json
 
 {
-  "Description" : "Tiger"
+  "Transmogrification" : "Tiger"
 }
 
 ### And now look up Tyrion's transmogrifications
 
-GET http://localhost:5000/Transmogrifications/Tyrion HTTP/1.1
+GET http://localhost:5000/Transmogrifier/Tyrion HTTP/1.1
 

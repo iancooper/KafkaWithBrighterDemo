@@ -77,14 +77,14 @@ namespace Transmogrifier.Database
             conn.Open();
             using var command = conn.CreateCommand();
 
-            command.CommandText = "CREATE DATABASE IF NOT EXISTS Greetings";
+            command.CommandText = "CREATE DATABASE IF NOT EXISTS Transmogrifications";
             try
             {
                 command.ExecuteScalar();
             }
             catch (System.Exception e)
             {
-                Console.WriteLine($"Issue with creating Greetings tables, {e.Message}");
+                Console.WriteLine($"Issue with creating Transmogrifications tables, {e.Message}");
                 //Rethrow, if we can't create the Outbox, shut down
                 throw;
             }
@@ -119,9 +119,9 @@ namespace Transmogrifier.Database
             }
         }
 
-        private static string GetConnectionString()
+        private static string GetConnectionString()           
         {
-            return "Filename=Greetings.db;Cache=Shared";
+            return "Filename=transmogrifications.sqlite;Cache=Shared";
         }
 
         private static DbConnection GetDbConnection(string connectionString)

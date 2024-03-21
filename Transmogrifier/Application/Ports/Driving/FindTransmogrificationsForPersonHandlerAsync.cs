@@ -13,10 +13,15 @@ using Transmogrifier.Policies;
 
 namespace Transmogrifier.Application.Ports.Driving
 {
-    public class FindTransmogrificationsForPersonHandlerAsync(
-        IAmARelationalDbConnectionProvider relationalDbConnectionProvider)
-        : QueryHandlerAsync<FindTransmogrificationsForPerson, FindPersonTransmogrifications>
+    public class FindTransmogrificationsForPersonHandlerAsync : QueryHandlerAsync<FindTransmogrificationsForPerson, FindPersonTransmogrifications>
     {
+        private readonly IAmARelationalDbConnectionProvider _relationalDbConnectionProvider;
+
+        public FindTransmogrificationsForPersonHandlerAsync(IAmARelationalDbConnectionProvider relationalDbConnectionProvider)
+        {
+            _relationalDbConnectionProvider = relationalDbConnectionProvider;
+        }
+
         [QueryLogging(0)]
         [RetryableQuery(1, Retry.EXPONENTIAL_RETRYPOLICYASYNC)]
         public override async Task<FindPersonTransmogrifications> ExecuteAsync(FindTransmogrificationsForPerson query,
@@ -28,9 +33,10 @@ namespace Transmogrifier.Application.Ports.Driving
 
             var sql = @"select p.Id, p.Name, t.Id, t.Description 
                         from Person p
-                        inner join Transmogrifications t on t.Recipient_Id = p.Id";
-            await using var connection = await relationalDbConnectionProvider.GetConnectionAsync(cancellationToken);
-            var people = await connection.QueryAsync<Person, Transmogrification, Person>(sql,
+                        inner join Transmogrification t on t.Recipient_Id = p.Id";
+            await using var connection = await _relationalDbConnectionProvider.GetConnectionAsync(cancellationToken);
+            var people = await connection.QueryAsync<Person, Transmogrification, Person>(
+                sql,
                 (person, transmogrification) =>
                 {
                     person.Transmogrifications.Add(transmogrification);

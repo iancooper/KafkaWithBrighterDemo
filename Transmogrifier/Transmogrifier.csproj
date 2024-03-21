@@ -12,10 +12,10 @@
         <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.7.0" />
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
         <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.1" />
-        <PackageReference Include="Paramore.Brighter" Version="10.0.0-preview.2" />
-        <PackageReference Include="Paramore.Brighter.Extensions.Hosting" Version="10.0.0-preview.2" />
-        <PackageReference Include="Paramore.Brighter.MessagingGateway.Kafka" Version="10.0.0-preview.2" />
-        <PackageReference Include="Paramore.Brighter.Outbox.Sqlite" Version="10.0.0-preview.2" />
+        <PackageReference Include="Paramore.Brighter" Version="10.0.0-preview.3" />
+        <PackageReference Include="Paramore.Brighter.Extensions.Hosting" Version="10.0.0-preview.3" />
+        <PackageReference Include="Paramore.Brighter.MessagingGateway.Kafka" Version="10.0.0-preview.3" />
+        <PackageReference Include="Paramore.Brighter.Outbox.Sqlite" Version="10.0.0-preview.3" />
         <PackageReference Include="Paramore.Darker.AspNetCore" Version="3.0.0" />
         <PackageReference Include="Paramore.Darker.Policies" Version="3.0.0" />
         <PackageReference Include="Paramore.Darker.QueryLogging" Version="3.0.0" />

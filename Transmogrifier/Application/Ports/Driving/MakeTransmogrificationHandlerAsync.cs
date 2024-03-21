@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,17 +9,27 @@ using Microsoft.Extensions.Logging;
 using Paramore.Brighter;
 using Paramore.Brighter.Logging.Attributes;
 using Paramore.Brighter.Policies.Attributes;
+using Paramore.Brighter.Sqlite;
 using Transmogrifier.Application.Entities;
 using Transmogrifier.Application.Ports.Driven;
 
 namespace Transmogrifier.Application.Ports.Driving
 {
-    public class MakeTransmogrificationHandlerAsync(
-        IAmATransactionConnectionProvider transactionProvider,
-        IAmACommandProcessor postBox,
-        ILogger<MakeTransmogrificationHandlerAsync> logger)
-        : RequestHandlerAsync<MakeTransmogrification>
+    public class MakeTransmogrificationHandlerAsync : RequestHandlerAsync<MakeTransmogrification>
     {
+        private readonly IAmATransactionConnectionProvider _transactionProvider;
+        private readonly IAmACommandProcessor _postBox;
+        private readonly ILogger<MakeTransmogrificationHandlerAsync> _logger;
+
+        public MakeTransmogrificationHandlerAsync(IAmATransactionConnectionProvider transactionProvider,
+            IAmACommandProcessor postBox,
+            ILogger<MakeTransmogrificationHandlerAsync> logger)
+        {
+            _transactionProvider = transactionProvider;
+            _postBox = postBox;
+            _logger = logger;
+        }
+
         [RequestLoggingAsync(0, HandlerTiming.Before)]
         [UsePolicyAsync(step:1, policy: Policies.Retry.EXPONENTIAL_RETRYPOLICYASYNC)]
         public override async Task<MakeTransmogrification> HandleAsync(MakeTransmogrification makeTransmogrification, CancellationToken cancellationToken = default)
@@ -28,8 +39,8 @@ namespace Transmogrifier.Application.Ports.Driving
             //We use the unit of work to grab connection and transaction, because Outbox needs
             //to share them 'behind the scenes'
 
-            var conn = await transactionProvider.GetConnectionAsync(cancellationToken);
-            var tx = await transactionProvider.GetTransactionAsync(cancellationToken);
+            var conn = await _transactionProvider.GetConnectionAsync(cancellationToken);
+            var tx = await _transactionProvider.GetTransactionAsync(cancellationToken);
             try
             {
                 var people = await conn.QueryAsync<Person>(
@@ -45,35 +56,35 @@ namespace Transmogrifier.Application.Ports.Driving
 
                     //write the added child entity to the Db
                     await conn.ExecuteAsync(
-                        "insert into Tramsmogrification (Description, Recipient_Id) values (@Description, @RecipientId)",
-                        new { transmogrification.Description, RecipientId = transmogrification.RecipientId },
+                        "insert into Transmogrification (Description, Recipient_Id) values (@Description, @RecipientId)",
+                        new { transmogrification.Description, transmogrification.RecipientId },
                         tx);
 
                     //Now write the message we want to send to the Db in the same transaction.
-                    posts.Add(await postBox.DepositPostAsync(
+                    posts.Add(await _postBox.DepositPostAsync(
                         new TransmogrificationMade(person, transmogrification),
-                        transactionProvider,
+                        _transactionProvider,
                         cancellationToken: cancellationToken));
 
                     //commit both new greeting and outgoing message
-                    await transactionProvider.CommitAsync(cancellationToken);
+                    await _transactionProvider.CommitAsync(cancellationToken);
                 }
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Exception thrown handling Add Description request");
+                _logger.LogError(e, "Exception thrown handling Add Description request");
                 //it went wrong, rollback the entity change and the downstream message
-                await transactionProvider.RollbackAsync(cancellationToken);
+                await _transactionProvider.RollbackAsync(cancellationToken);
                 return await base.HandleAsync(makeTransmogrification, cancellationToken);
             }
             finally
             {
-                transactionProvider.Close();
+                _transactionProvider.Close();
             }
 
             //Send this message via a transport. We need the ids to send just the messages here, not all outstanding ones.
             //Alternatively, you can let the Sweeper do this, but at the cost of increased latency
-            await postBox.ClearOutboxAsync(posts, cancellationToken:cancellationToken);
+            await _postBox.ClearOutboxAsync(posts, cancellationToken:cancellationToken);
 
             return await base.HandleAsync(makeTransmogrification, cancellationToken);
         }

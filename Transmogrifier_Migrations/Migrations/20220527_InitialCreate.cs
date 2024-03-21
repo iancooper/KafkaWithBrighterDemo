@@ -16,10 +16,6 @@ public class SqlInitialCreate : Migration
             .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
             .WithColumn("Description").AsString()
             .WithColumn("Recipient_Id").AsInt32();
-
-        Create.ForeignKey()
-            .FromTable("Transmogrification").ForeignColumn("Recipient_Id")
-            .ToTable("Person").PrimaryColumn("Id");
     }
 
     public override void Down()

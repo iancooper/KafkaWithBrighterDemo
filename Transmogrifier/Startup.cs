@@ -107,9 +107,6 @@ namespace Transmogrifier
             );
             services.AddSingleton<IAmARelationalDatabaseConfiguration>(outboxConfiguration);
 
-            (IAmAnOutbox outbox, Type connectionProvider, Type transactionProvider) makeOutbox =
-                (new SqliteOutbox(outboxConfiguration), typeof(SqliteConnectionProvider), typeof(SqliteUnitOfWork));
-
             services.AddBrighter(options =>
                 {
                     //we want to use scoped, so make sure everything understands that which needs to
@@ -119,11 +116,11 @@ namespace Transmogrifier
                     options.PolicyRegistry = new GreetingsPolicy();
                 })
                 .UseExternalBus((configure) =>
-                        {
+                {
                     configure.ProducerRegistry = ConfigureProducerRegistry();
-                    configure.Outbox = makeOutbox.outbox;
-                    configure.TransactionProvider = makeOutbox.transactionProvider;
-                    configure.ConnectionProvider = makeOutbox.connectionProvider;
+                    configure.Outbox = new SqliteOutbox(outboxConfiguration);
+                    configure.TransactionProvider = typeof(SqliteUnitOfWork);
+                    configure.ConnectionProvider =  typeof(SqliteConnectionProvider);
                 })
                 .UseOutboxSweeper(options => {
                     options.TimerInterval = 5;
@@ -169,7 +166,7 @@ namespace Transmogrifier
 
         private string DbConnectionString()
         {
-            return "Filename=Transmogrifications.db;Cache=Shared";
+            return "Filename=Transmogrifications.sqlite;Cache=Shared";
         }
     }
 }

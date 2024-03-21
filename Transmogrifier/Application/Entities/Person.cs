@@ -8,7 +8,7 @@ public class Person
     public DateTime TimeStamp { get; set; }
     public int Id { get; set; }
     public string Name { get; set; }
-    public IList<Transmogrification> Transmogrifications { get; set; } = new List<Transmogrification>();
+    public List<Transmogrification> Transmogrifications { get; set; } = new List<Transmogrification>();
     
     public Person(){ /*Required for Dapper*/}
 
