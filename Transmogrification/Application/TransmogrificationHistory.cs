@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Transmogrification.Application.Entities
+﻿namespace Transmogrification.Application
 {
     public class TransmogrificationHistory(string name, string transmogrification)
     {

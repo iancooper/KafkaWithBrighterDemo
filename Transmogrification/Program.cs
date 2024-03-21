@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using FluentMigrator.Runner;
@@ -15,15 +16,32 @@ using Paramore.Brighter.MessagingGateway.Kafka;
 using Paramore.Brighter.ServiceActivator.Extensions.DependencyInjection;
 using Paramore.Brighter.ServiceActivator.Extensions.Hosting;
 using Paramore.Brighter.Sqlite;
+using Transmogrification.Adapters.Driven;
 using Transmogrification.Application.Ports.Driving;
 using Transmogrification.Database;
 using Transmogrification.Policies;
+
+CancellationTokenSource cts = new CancellationTokenSource();
+Console.CancelKeyPress += (_, e) => {
+    e.Cancel = true; //terminate the pump
+    cts.Cancel();
+};
 
 var host = CreateHostBuilder(args).Build();
 host.CheckDbIsUp();
 host.MigrateDatabase();
 host.CreateInbox();
-await host.RunAsync();
+
+var box = new Box();
+if (box.StarTransformation())
+{
+    box.BeginTransforming();
+
+    await host.RunAsync(cts.Token);
+
+    box.EndTransforming();
+}
+
 return;
 
 static void AddSchemaRegistry(IServiceCollection services)

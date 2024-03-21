@@ -8,7 +8,6 @@ using Paramore.Darker;
 using Paramore.Darker.Policies;
 using Paramore.Darker.QueryLogging;
 using Transmogrifier.Adapters.Driving;
-using Transmogrifier.Application.Entities;
 using Transmogrifier.Policies;
 
 namespace Transmogrifier.Application.Ports.Driving

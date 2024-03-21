@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Paramore.Brighter;
 using Paramore.Brighter.Logging.Attributes;
 using Paramore.Brighter.Policies.Attributes;
-using Transmogrifier.Application.Entities;
 
 namespace Transmogrifier.Application.Ports.Driving
 {

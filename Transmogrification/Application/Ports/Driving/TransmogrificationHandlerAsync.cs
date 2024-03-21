@@ -7,12 +7,12 @@ using Paramore.Brighter;
 using Paramore.Brighter.Inbox.Attributes;
 using Paramore.Brighter.Logging.Attributes;
 using Paramore.Brighter.Policies.Attributes;
-using Transmogrification.Application.Entities;
 
 namespace Transmogrification.Application.Ports.Driving
 {
     public class TransmogrificationHandlerAsync(
         IAmARelationalDbConnectionProvider relationalDbConnectionProvider,
+        IAmACommandProcessor commandProcessor,
         ILogger<TransmogrificationHandlerAsync> logger)
         : RequestHandlerAsync<TransmogrificationMade>
     {
@@ -28,7 +28,7 @@ namespace Transmogrification.Application.Ports.Driving
                 var history = new TransmogrificationHistory(@event.Name, @event.Transmogrification);
                 
                await conn.ExecuteAsync(
-                   "insert into TransmogrificationHistory (Name, Transmogrification) values (@name, @transformation)", 
+                   "insert into TransmogrificationHappened (Name, Transmogrification) values (@name, @transformation)", 
                    new {name = history.Name, transformation = history.Transmogrification}
                    ); 
                 
@@ -38,6 +38,8 @@ namespace Transmogrification.Application.Ports.Driving
                 logger.LogError(e, "Could not save transmogrification settings");
                 return await base.HandleAsync(@event, cancellationToken);
             }
+            
+            await commandProcessor.PublishAsync(new TransmogrificationHappened(@event.Name, @event.Transmogrification), cancellationToken: cancellationToken);
             
             return await base.HandleAsync(@event, cancellationToken);
         }

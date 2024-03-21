@@ -19,6 +19,7 @@
       <PackageReference Include="Paramore.Brighter.ServiceActivator.Extensions.Hosting"/>
       <PackageReference Include="Paramore.Brighter.Sqlite"/>
       <PackageReference Include="Polly.Contrib.WaitAndRetry"/>
+      <PackageReference Include="Spectre.Console"/>
     </ItemGroup>
 
     <ItemGroup>

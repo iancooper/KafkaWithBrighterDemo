@@ -1,4 +1,4 @@
-namespace Transmogrifier.Application.Entities;
+namespace Transmogrifier.Application;
 
 public class Transmogrification
 {

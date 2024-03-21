@@ -10,7 +10,6 @@ using Paramore.Brighter;
 using Paramore.Brighter.Logging.Attributes;
 using Paramore.Brighter.Policies.Attributes;
 using Paramore.Brighter.Sqlite;
-using Transmogrifier.Application.Entities;
 using Transmogrifier.Application.Ports.Driven;
 
 namespace Transmogrifier.Application.Ports.Driving

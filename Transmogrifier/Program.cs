@@ -14,6 +14,7 @@ host.MigrateDatabase();
 host.CreateOutbox(true);
 
 host.Run();
+
 return;
 
 static IHostBuilder CreateHostBuilder(string[] args) =>

@@ -1,6 +1,5 @@
 ﻿using System;
 using Paramore.Brighter;
-using Transmogrifier.Application.Entities;
 
 namespace Transmogrifier.Application.Ports.Driven
 {

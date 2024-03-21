@@ -1,4 +1,4 @@
-using Transmogrifier.Application.Entities;
+using Transmogrifier.Application;
 
 namespace Transmogrifier.Adapters.Driving
 {
