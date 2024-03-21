@@ -74,6 +74,7 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
             ConfigureSqlite(hostContext, services);
             ConfigureDapperSqlite(services);
             ConfigureBrighter(hostContext, services);
+            ConfigureBox(services);
         })
         .UseConsoleLifetime();
 
@@ -128,6 +129,11 @@ static void ConfigureDapperSqlite(IServiceCollection services)
 {
     services.AddScoped<IAmARelationalDbConnectionProvider, SqliteConnectionProvider>();
     services.AddScoped<IAmATransactionConnectionProvider, SqliteUnitOfWork>();
+}
+
+static void ConfigureBox(IServiceCollection services)
+{
+    services.AddSingleton<IBox>(new Box());
 }
 
 static IAmAnInbox CreateInbox(HostBuilderContext hostContext, IAmARelationalDatabaseConfiguration configuration)
