@@ -8,22 +8,14 @@ namespace Transmogrifier.Adapters.Driving
 {
     [ApiController]
     [Route("[controller]")]
-    public class TransmogrifierController : Controller
+    public class TransmogrifierController(IAmACommandProcessor commandProcessor, IQueryProcessor queryProcessor)
+        : Controller
     {
-        private readonly IAmACommandProcessor _commandProcessor;
-        private readonly IQueryProcessor _queryProcessor;
-
-        public TransmogrifierController(IAmACommandProcessor commandProcessor, IQueryProcessor queryProcessor)
-        {
-            _commandProcessor = commandProcessor;
-            _queryProcessor = queryProcessor;
-        }
-
         [Route("{name}")]
         [HttpGet]
         public async Task<IActionResult> Get(string name)
         {
-             var personsGreetings = await _queryProcessor.ExecuteAsync(new FindTransmogrificationsForPerson(name));
+             var personsGreetings = await queryProcessor.ExecuteAsync(new FindTransmogrificationsForPerson(name));
  
              if (personsGreetings == null) return new NotFoundResult();
  
@@ -34,9 +26,9 @@ namespace Transmogrifier.Adapters.Driving
         [HttpPost]
         public async Task<ActionResult<FindPersonTransmogrifications>> Post(string name, NewTransmogrification newTransmogrification)
         {
-            await _commandProcessor.SendAsync(new MakeTransmogrification(name, newTransmogrification.Transmogrification));
+            await commandProcessor.SendAsync(new MakeTransmogrification(name, newTransmogrification.Transmogrification));
 
-            var personsGreetings = await _queryProcessor.ExecuteAsync(new FindTransmogrificationsForPerson(name));
+            var personsGreetings = await queryProcessor.ExecuteAsync(new FindTransmogrificationsForPerson(name));
 
             if (personsGreetings == null) return new NotFoundResult();
 

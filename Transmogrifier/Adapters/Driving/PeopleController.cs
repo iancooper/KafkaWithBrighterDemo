@@ -8,23 +8,14 @@ namespace Transmogrifier.Adapters.Driving
 {
     [ApiController]
     [Route("[controller]")]
-    public class PeopleController : Controller
+    public class PeopleController(IAmACommandProcessor commandProcessor, IQueryProcessor queryProcessor)
+        : Controller
     {
-        private readonly IAmACommandProcessor _commandProcessor;
-        private readonly IQueryProcessor _queryProcessor;
-
-        public PeopleController(IAmACommandProcessor commandProcessor, IQueryProcessor queryProcessor)
-        {
-            _commandProcessor = commandProcessor;
-            _queryProcessor = queryProcessor;
-        }
-
-        
-         [Route("{name}")]
+        [Route("{name}")]
          [HttpGet]
          public async Task<ActionResult<FindPersonResult>> Get(string name)
         {
-            var foundPerson = await _queryProcessor.ExecuteAsync<FindPersonResult>(new FindPersonByName(name));
+            var foundPerson = await queryProcessor.ExecuteAsync<FindPersonResult>(new FindPersonByName(name));
 
             if (foundPerson.Person == null) return new NotFoundResult();
 
@@ -35,7 +26,7 @@ namespace Transmogrifier.Adapters.Driving
         [HttpDelete]
         public async Task<IActionResult> Delete(string name)
         {
-            await _commandProcessor.SendAsync(new DeletePerson(name));
+            await commandProcessor.SendAsync(new DeletePerson(name));
 
             return Ok();
         }
@@ -44,9 +35,9 @@ namespace Transmogrifier.Adapters.Driving
         [HttpPost]
         public async Task<ActionResult<FindPersonResult>> Post(NewPerson newPerson)
         {
-            await _commandProcessor.SendAsync(new AddPerson(newPerson.Name));
+            await commandProcessor.SendAsync(new AddPerson(newPerson.Name));
 
-            var addedPerson = await _queryProcessor.ExecuteAsync<FindPersonResult>(new FindPersonByName(newPerson.Name));
+            var addedPerson = await queryProcessor.ExecuteAsync<FindPersonResult>(new FindPersonByName(newPerson.Name));
 
             if (addedPerson == null) return new NotFoundResult(); 
 

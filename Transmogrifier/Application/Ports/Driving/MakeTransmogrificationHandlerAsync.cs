@@ -15,21 +15,12 @@ using Transmogrifier.Application.Ports.Driven;
 
 namespace Transmogrifier.Application.Ports.Driving
 {
-    public class MakeTransmogrificationHandlerAsync : RequestHandlerAsync<MakeTransmogrification>
+    public class MakeTransmogrificationHandlerAsync(
+        IAmATransactionConnectionProvider transactionProvider,
+        IAmACommandProcessor postBox,
+        ILogger<MakeTransmogrificationHandlerAsync> logger)
+        : RequestHandlerAsync<MakeTransmogrification>
     {
-        private readonly IAmATransactionConnectionProvider _transactionProvider;
-        private readonly IAmACommandProcessor _postBox;
-        private readonly ILogger<MakeTransmogrificationHandlerAsync> _logger;
-
-        public MakeTransmogrificationHandlerAsync(IAmATransactionConnectionProvider transactionProvider,
-            IAmACommandProcessor postBox,
-            ILogger<MakeTransmogrificationHandlerAsync> logger)
-        {
-            _transactionProvider = transactionProvider;
-            _postBox = postBox;
-            _logger = logger;
-        }
-
         [RequestLoggingAsync(0, HandlerTiming.Before)]
         [UsePolicyAsync(step:1, policy: Policies.Retry.EXPONENTIAL_RETRYPOLICYASYNC)]
         public override async Task<MakeTransmogrification> HandleAsync(MakeTransmogrification makeTransmogrification, CancellationToken cancellationToken = default)
@@ -39,8 +30,8 @@ namespace Transmogrifier.Application.Ports.Driving
             //We use the unit of work to grab connection and transaction, because Outbox needs
             //to share them 'behind the scenes'
 
-            var conn = await _transactionProvider.GetConnectionAsync(cancellationToken);
-            var tx = await _transactionProvider.GetTransactionAsync(cancellationToken);
+            var conn = await transactionProvider.GetConnectionAsync(cancellationToken);
+            var tx = await transactionProvider.GetTransactionAsync(cancellationToken);
             try
             {
                 var people = await conn.QueryAsync<Person>(
@@ -61,30 +52,30 @@ namespace Transmogrifier.Application.Ports.Driving
                         tx);
 
                     //Now write the message we want to send to the Db in the same transaction.
-                    posts.Add(await _postBox.DepositPostAsync(
+                    posts.Add(await postBox.DepositPostAsync(
                         new TransmogrificationMade(person, transmogrification),
-                        _transactionProvider,
+                        transactionProvider,
                         cancellationToken: cancellationToken));
 
                     //commit both new greeting and outgoing message
-                    await _transactionProvider.CommitAsync(cancellationToken);
+                    await transactionProvider.CommitAsync(cancellationToken);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Exception thrown handling Add Description request");
+                logger.LogError(e, "Exception thrown handling Add Description request");
                 //it went wrong, rollback the entity change and the downstream message
-                await _transactionProvider.RollbackAsync(cancellationToken);
+                await transactionProvider.RollbackAsync(cancellationToken);
                 return await base.HandleAsync(makeTransmogrification, cancellationToken);
             }
             finally
             {
-                _transactionProvider.Close();
+                transactionProvider.Close();
             }
 
             //Send this message via a transport. We need the ids to send just the messages here, not all outstanding ones.
             //Alternatively, you can let the Sweeper do this, but at the cost of increased latency
-            await _postBox.ClearOutboxAsync(posts, cancellationToken:cancellationToken);
+            await postBox.ClearOutboxAsync(posts, cancellationToken:cancellationToken);
 
             return await base.HandleAsync(makeTransmogrification, cancellationToken);
         }
