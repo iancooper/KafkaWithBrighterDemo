@@ -6,19 +6,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Dapper" Version="2.1.28" />
-      <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.2"/>
-        <PackageReference Include="FluentMigrator" Version="5.1.0" />
-        <PackageReference Include="FluentMigrator.Runner" Version="5.1.0" />
-        <PackageReference Include="Paramore.Brighter" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Brighter.Extensions.Hosting" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Brighter.Inbox.Sqlite" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Brighter.MessagingGateway.Kafka" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Brighter.Outbox.Sqlite" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Brighter.ServiceActivator" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Brighter.ServiceActivator.Extensions.DependencyInjection" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Brighter.ServiceActivator.Extensions.Hosting" Version="10.0.0-preview.3" />
-        <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
+      <PackageReference Include="Dapper"/>
+      <PackageReference Include="Microsoft.Data.Sqlite.Core"/>
+      <PackageReference Include="FluentMigrator"/>
+      <PackageReference Include="FluentMigrator.Runner"/>
+      <PackageReference Include="Paramore.Brighter"/>
+      <PackageReference Include="Paramore.Brighter.Extensions.Hosting"/>
+      <PackageReference Include="Paramore.Brighter.Inbox.Sqlite"/>
+      <PackageReference Include="Paramore.Brighter.MessagingGateway.Kafka"/>
+      <PackageReference Include="Paramore.Brighter.ServiceActivator"/>
+      <PackageReference Include="Paramore.Brighter.ServiceActivator.Extensions.DependencyInjection"/>
+      <PackageReference Include="Paramore.Brighter.ServiceActivator.Extensions.Hosting"/>
+      <PackageReference Include="Polly.Contrib.WaitAndRetry"/>
     </ItemGroup>
 
     <ItemGroup>

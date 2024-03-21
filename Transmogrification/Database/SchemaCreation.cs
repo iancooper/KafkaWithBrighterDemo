@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Paramore.Brighter.Inbox.Sqlite;
-using Paramore.Brighter.Outbox.Sqlite;
 using Polly;
 
 namespace Transmogrification.Database
@@ -16,7 +15,6 @@ namespace Transmogrification.Database
     public static class SchemaCreation
     {
         internal const string INBOX_TABLE_NAME = "Inbox";
-        internal const string OUTBOX_TABLE_NAME = "Outbox";
 
         public static IHost CheckDbIsUp(this IHost host)
         {
@@ -50,18 +48,6 @@ namespace Transmogrification.Database
             return host;
         }
         
-        public static IHost CreateOutbox(this IHost webHost, bool hasBinaryMessagePayload)
-        {
-            using var scope = webHost.Services.CreateScope();
-            var services = scope.ServiceProvider;
-            var env = services.GetService<IHostEnvironment>();
-            var config = services.GetService<IConfiguration>();
-
-            CreateOutbox(config, env, hasBinaryMessagePayload);
-
-            return webHost;
-        }
-
         public static IHost MigrateDatabase(this IHost host)
         {
             using var scope = host.Services.CreateScope();
@@ -130,39 +116,6 @@ namespace Transmogrification.Database
 
             using var command = sqlConnection.CreateCommand();
             command.CommandText = SqliteInboxBuilder.GetDDL(INBOX_TABLE_NAME);
-            command.ExecuteScalar();
-        }
-
-
-        private static void CreateOutbox(IConfiguration config, IHostEnvironment env, bool hasBinaryMessagePayload)
-        {
-            try
-            {
-                var connectionString = DbConnectionString();
-
-                CreateOutboxSqlite(connectionString, hasBinaryMessagePayload);
-            }
-            catch (System.Exception e)
-            {
-                Console.WriteLine($"Issue with creating Outbox table, {e.Message}");
-                //Rethrow, if we can't create the Outbox, shut down
-                throw;
-            }
-        }
-
-        private static void CreateOutboxSqlite(string connectionString, bool hasBinaryMessagePayload)
-        {
-            using var sqlConnection = new SqliteConnection(connectionString);
-            sqlConnection.Open();
-
-            using var exists = sqlConnection.CreateCommand();
-            exists.CommandText = SqliteOutboxBuilder.GetExistsQuery(OUTBOX_TABLE_NAME);
-            using var reader = exists.ExecuteReader(CommandBehavior.SingleRow);
-
-            if (reader.HasRows) return;
-
-            using var command = sqlConnection.CreateCommand();
-            command.CommandText = SqliteOutboxBuilder.GetDDL(OUTBOX_TABLE_NAME, hasBinaryMessagePayload);
             command.ExecuteScalar();
         }
 

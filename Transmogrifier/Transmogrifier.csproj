@@ -5,23 +5,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Confluent.SchemaRegistry" Version="2.3.0" />
-        <PackageReference Include="Dapper" Version="2.1.28" />
-        <PackageReference Include="FluentMigrator" Version="5.1.0" />
-        <PackageReference Include="FluentMigrator.Runner" Version="5.1.0" />
-        <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.7.0" />
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.1" />
-        <PackageReference Include="Paramore.Brighter" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Brighter.Extensions.Hosting" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Brighter.MessagingGateway.Kafka" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Brighter.Outbox.Sqlite" Version="10.0.0-preview.3" />
-        <PackageReference Include="Paramore.Darker.AspNetCore" Version="3.0.0" />
-        <PackageReference Include="Paramore.Darker.Policies" Version="3.0.0" />
-        <PackageReference Include="Paramore.Darker.QueryLogging" Version="3.0.0" />
-        <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
+        <PackageReference Include="Confluent.SchemaRegistry"/>
+        <PackageReference Include="Dapper"/>
+        <PackageReference Include="FluentMigrator"/>
+        <PackageReference Include="FluentMigrator.Runner"/>
+        <PackageReference Include="OpenTelemetry.Exporter.Console"/>
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore"/>
+        <PackageReference Include="Paramore.Brighter"/>
+        <PackageReference Include="Paramore.Brighter.Extensions.Hosting"/>
+        <PackageReference Include="Paramore.Brighter.MessagingGateway.Kafka"/>
+        <PackageReference Include="Paramore.Brighter.Outbox.Sqlite"/>
+        <PackageReference Include="Paramore.Darker.AspNetCore"/>
+        <PackageReference Include="Paramore.Darker.Policies"/>
+        <PackageReference Include="Paramore.Darker.QueryLogging"/>
+        <PackageReference Include="Polly.Contrib.WaitAndRetry"/>
+        <PackageReference Include="Swashbuckle.AspNetCore"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen"/>
     </ItemGroup>
 
     <ItemGroup>
