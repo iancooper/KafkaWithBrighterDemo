@@ -12,10 +12,10 @@ using Paramore.Brighter.Extensions.DependencyInjection;
 using Paramore.Brighter.Inbox;
 using Paramore.Brighter.Inbox.Sqlite;
 using Paramore.Brighter.MessagingGateway.Kafka;
-using Paramore.Brighter.Outbox.Sqlite;
 using Paramore.Brighter.ServiceActivator.Extensions.DependencyInjection;
 using Paramore.Brighter.ServiceActivator.Extensions.Hosting;
 using Paramore.Brighter.Sqlite;
+using Transmogrification.Application.Ports.Driving;
 using Transmogrification.Database;
 using Transmogrification.Policies;
 
@@ -144,11 +144,11 @@ static KafkaSubscription[] GetSubscriptions()
 {
     var subscriptions = new KafkaSubscription[]
     {
-        new KafkaSubscription<Transmogrification.Application.Ports.Driving.TransmogrificationMade>(
+        new KafkaSubscription<TransmogrificationMade>(
             new SubscriptionName("paramore.sample.transmogrification"),
             channelName: new ChannelName("TransmogrificationMade"),
             routingKey: new RoutingKey("TransmogrificationMade"),
-            groupId: "kafka-GreetingsReceiverConsole-Sample",
+            groupId: "Transmogrification-History",
             timeoutInMilliseconds: 100,
             offsetDefault: AutoOffsetReset.Earliest,
             commitBatchSize: 5,

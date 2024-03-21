@@ -17,6 +17,7 @@
       <PackageReference Include="Paramore.Brighter.ServiceActivator"/>
       <PackageReference Include="Paramore.Brighter.ServiceActivator.Extensions.DependencyInjection"/>
       <PackageReference Include="Paramore.Brighter.ServiceActivator.Extensions.Hosting"/>
+      <PackageReference Include="Paramore.Brighter.Sqlite"/>
       <PackageReference Include="Polly.Contrib.WaitAndRetry"/>
     </ItemGroup>
 
