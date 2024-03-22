@@ -2,8 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using Microsoft.Extensions.Http.Resilience;
-using Polly;
 using Transmogrification;
 
 public class Dispatcher(HttpConfig httpConfig)

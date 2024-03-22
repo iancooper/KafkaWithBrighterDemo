@@ -18,8 +18,10 @@ namespace TransmogrifierAPI.Application.Ports.Driving
     {
         [QueryLogging(0)]
         [RetryableQuery(1, Retry.EXPONENTIAL_RETRYPOLICYASYNC)]
-        public override async Task<FindPersonTransmogrifications> ExecuteAsync(FindTransmogrificationsForPerson query,
-            CancellationToken cancellationToken = new CancellationToken())
+        public override async Task<FindPersonTransmogrifications> ExecuteAsync(
+            FindTransmogrificationsForPerson query,
+            CancellationToken cancellationToken = new CancellationToken()
+            )
         {
             //Retrieving parent and child is a bit tricky with Dapper. From raw SQL We wget back a set that has a row-per-child. We need to turn that
             //into one entity per parent, with a collection of children. To do that we bring everything back into memory, group by parent id and collate all
@@ -28,7 +30,7 @@ namespace TransmogrifierAPI.Application.Ports.Driving
             var sql = @"select p.Id, p.Name, t.Id, t.Description 
                         from Person p
                         inner join Transmogrification t on t.Recipient_Id = p.Id
-                        where p.Name = @Name";
+                        where p.Name = @name";
             
             await using var connection = await relationalDbConnectionProvider.GetConnectionAsync(cancellationToken);
             var people = await connection.QueryAsync<Person, Transmogrification, Person>(
@@ -37,7 +39,9 @@ namespace TransmogrifierAPI.Application.Ports.Driving
                 {
                     person.Transmogrifications.Add(transmogrification);
                     return person;
-                }, splitOn: "Id");
+                }, 
+                param: new {name = query.Name},
+                splitOn: "Id");
 
             if (!people.Any())
             {
