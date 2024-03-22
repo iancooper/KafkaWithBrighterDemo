@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transmogrification_Migratio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transmogrification", "Transmogrification\Transmogrification.csproj", "{32E8E240-AFAE-4883-ADF5-199450798501}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transmogrifier", "Transmogrifier\Transmogrifier.csproj", "{7163B042-BEF4-4F61-9AC9-A3460FC5F3B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransmogrifierAPI", "TransmogrifierAPI\TransmogrifierAPI.csproj", "{7163B042-BEF4-4F61-9AC9-A3460FC5F3B3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transmogrifier_Migrations", "Transmogrifier_Migrations\Transmogrifier_Migrations.csproj", "{946CF785-FC02-4322-B595-076FBC8D5103}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transmogrifier", "Transmogrifier\Transmogrifier.csproj", "{FC3EBE61-5681-4F8A-9345-59D13FDFB854}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{946CF785-FC02-4322-B595-076FBC8D5103}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{946CF785-FC02-4322-B595-076FBC8D5103}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{946CF785-FC02-4322-B595-076FBC8D5103}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC3EBE61-5681-4F8A-9345-59D13FDFB854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC3EBE61-5681-4F8A-9345-59D13FDFB854}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC3EBE61-5681-4F8A-9345-59D13FDFB854}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC3EBE61-5681-4F8A-9345-59D13FDFB854}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

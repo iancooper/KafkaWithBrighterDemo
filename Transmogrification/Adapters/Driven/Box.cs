@@ -17,7 +17,7 @@ public class Box : IBox
     public bool StarTransformation()
     {
         AnsiConsole.WriteLine();
-        return AnsiConsole.Confirm("[green]Begin Transfmogrification?[/]");
+        return AnsiConsole.Confirm("[green]Begin Transmogrification?[/]");
     }
 
     public void BeginTransforming()

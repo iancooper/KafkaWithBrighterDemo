@@ -1,48 +1,33 @@
-using System.IO;
-using FluentMigrator.Runner;
-using Transmogrifier;
-using Transmogrifier.Database;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using Transmogrification;
 
-var host = CreateHostBuilder(args).Build();
+var theBox = new Box();
+var theDial = new Dial();
 
-host.CheckDbIsUp();
-host.MigrateDatabase();
-host.CreateOutbox(true);
+var httpConfig = new HttpConfig
+{
+    Url = new Uri(" http://localhost:5000")
+};
 
-host.Run();
+var dispatcher = new Dispatcher(httpConfig);
 
-return;
+bool stop = false;
 
-static IHostBuilder CreateHostBuilder(string[] args) =>
-    Host.CreateDefaultBuilder(args)
-        .ConfigureAppConfiguration((context, configBuilder) =>
-        {
-            var env = context.HostingEnvironment;
-            configBuilder.AddJsonFile("appsettings.json", optional: false);
-            configBuilder.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-            configBuilder.AddEnvironmentVariables(prefix: "BRIGHTER_");
-        })
-        .ConfigureWebHostDefaults(webBuilder =>
-        {
-            webBuilder.UseKestrel();
-            webBuilder.UseContentRoot(Directory.GetCurrentDirectory());
-            webBuilder.CaptureStartupErrors(true);
-            webBuilder.UseSetting("detailedErrors", "true");
-            webBuilder.ConfigureLogging((hostingContext, logging) =>
-            {
-                logging.AddConsole();
-                logging.AddDebug();
-                logging.AddFluentMigratorConsole();
-            });
-            webBuilder.UseDefaultServiceProvider((context, options) =>
-            {
-                var isDevelopment = context.HostingEnvironment.IsDevelopment();
-                options.ValidateScopes = isDevelopment;
-                options.ValidateOnBuild = isDevelopment;
-            });
-            webBuilder.UseStartup<Startup>();
-        });
+while (!stop)
+{
+
+    var settings = new TransmogrificationSettings();
+    settings.Name = theBox.AskName();
+
+    settings.Transformation = theDial.AskForTransformation(settings.Name);
+
+    theDial.DisplaySettings(settings);
+
+    theBox.EnterTransmogrifier(settings);
+
+    if (await dispatcher.Transmogrify(settings))
+        theBox.MarkTransmogrificationComplete();
+    else
+        theBox.MarkTransmogrificationFailed();
+    
+    stop = theBox.AskIfDone();
+}

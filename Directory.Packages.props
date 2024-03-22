@@ -1,32 +1,34 @@
 <Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageVersion Include="Confluent.SchemaRegistry" Version="2.3.0"/>
-        <PackageVersion Include="Dapper" Version="2.1.28"/>
-        <PackageVersion Include="FluentMigrator" Version="5.1.0"/>
-        <PackageVersion Include="FluentMigrator.Runner" Version="5.1.0"/>
-        <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="8.0.2"/>
-        <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.7.0"/>
-        <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.7.0"/>
-        <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.1"/>
-        <PackageVersion Include="Paramore.Brighter" Version="10.0.0-preview.3"/>
-        <PackageVersion Include="Paramore.Brighter.Extensions.Hosting" Version="10.0.0-preview.3"/>
-        <PackageVersion Include="Paramore.Brighter.Inbox.Sqlite" Version="10.0.0-preview.3"/>
-        <PackageVersion Include="Paramore.Brighter.MessagingGateway.Kafka" Version="10.0.0-preview.3"/>
-        <PackageVersion Include="Paramore.Brighter.Outbox.Sqlite" Version="10.0.0-preview.3"/>
-        <PackageVersion Include="Paramore.Brighter.ServiceActivator" Version="10.0.0-preview.3"/>
-        <PackageVersion Include="Paramore.Brighter.ServiceActivator.Extensions.DependencyInjection" Version="10.0.0-preview.3"/>
-        <PackageVersion Include="Paramore.Brighter.ServiceActivator.Extensions.Hosting" Version="10.0.0-preview.3"/>
-        <PackageVersion Include="Paramore.Brighter.Sqlite" Version="10.0.0-preview.3"/> 
-        <PackageVersion Include="Paramore.Darker.AspNetCore" Version="3.0.0"/>
-        <PackageVersion Include="Paramore.Darker.Policies" Version="3.0.0"/>
-        <PackageVersion Include="Paramore.Darker.QueryLogging" Version="3.0.0"/>
-        <PackageVersion Include="Polly.Contrib.WaitAndRetry" Version="1.1.1"/>
-        <PackageVersion Include="Spectre.Console" Version="0.48.0" />
-        <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
-        <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0"/>
-    </ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Confluent.SchemaRegistry" Version="2.3.0" />
+    <PackageVersion Include="Dapper" Version="2.1.28" />
+    <PackageVersion Include="FluentMigrator" Version="5.1.0" />
+    <PackageVersion Include="FluentMigrator.Runner" Version="5.1.0" />
+    <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="8.3.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.7.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.1" />
+    <PackageVersion Include="Paramore.Brighter" Version="10.0.0-preview.3" />
+    <PackageVersion Include="Paramore.Brighter.Extensions.Hosting" Version="10.0.0-preview.3" />
+    <PackageVersion Include="Paramore.Brighter.Inbox.Sqlite" Version="10.0.0-preview.3" />
+    <PackageVersion Include="Paramore.Brighter.MessagingGateway.Kafka" Version="10.0.0-preview.3" />
+    <PackageVersion Include="Paramore.Brighter.Outbox.Sqlite" Version="10.0.0-preview.3" />
+    <PackageVersion Include="Paramore.Brighter.ServiceActivator" Version="10.0.0-preview.3" />
+    <PackageVersion Include="Paramore.Brighter.ServiceActivator.Extensions.DependencyInjection" Version="10.0.0-preview.3" />
+    <PackageVersion Include="Paramore.Brighter.ServiceActivator.Extensions.Hosting" Version="10.0.0-preview.3" />
+    <PackageVersion Include="Paramore.Brighter.Sqlite" Version="10.0.0-preview.3" />
+    <PackageVersion Include="Paramore.Darker.AspNetCore" Version="3.0.0" />
+    <PackageVersion Include="Paramore.Darker.Policies" Version="3.0.0" />
+    <PackageVersion Include="Paramore.Darker.QueryLogging" Version="3.0.0" />
+    <PackageVersion Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
+    <PackageVersion Include="Polly.Core" Version="8.3.1" />
+    <PackageVersion Include="Spectre.Console" Version="0.48.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
+  </ItemGroup>
 </Project>
