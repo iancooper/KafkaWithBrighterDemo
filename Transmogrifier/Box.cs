@@ -30,12 +30,12 @@ public class Box
     public void MarkTransmogrificationComplete()
     {
        AnsiConsole.WriteLine();
-       AnsiConsole.Write("Transmogrification complete: [green]You look awesome![/]");
+       AnsiConsole.MarkupLine("Transmogrification complete: [yellow]You look awesome[/]");
     }
 
     public void MarkTransmogrificationFailed()
     {
         AnsiConsole.WriteLine();
-        AnsiConsole.Write("Transmogrification failed: [red]You look the same![/]");
+        AnsiConsole.MarkupLine("Transmogrification failed: [red]You look the same[/]");
     }
 }
